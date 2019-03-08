@@ -81,9 +81,22 @@ func NewEncryptWalletCmd(passphrase string) *EncryptWalletCmd {
 	}
 }
 
+// EstimateSmartFeeCmd defines the estimatefee JSON-RPC command.
+type EstimateSmartFeeCmd struct {
+	NumBlocks int64
+}
+
 // EstimateFeeCmd defines the estimatefee JSON-RPC command.
 type EstimateFeeCmd struct {
 	NumBlocks int64
+}
+
+// NewEstimateSmartFeeCmd returns a new instance which can be used to issue a
+// estimatefee JSON-RPC command.
+func NewEstimateSmartFeeCmd(numBlocks int64) *EstimateSmartFeeCmd {
+	return &EstimateSmartFeeCmd{
+		NumBlocks: numBlocks,
+	}
 }
 
 // NewEstimateFeeCmd returns a new instance which can be used to issue a
@@ -662,7 +675,8 @@ func init() {
 	MustRegisterCmd("createmultisig", (*CreateMultisigCmd)(nil), flags)
 	MustRegisterCmd("dumpprivkey", (*DumpPrivKeyCmd)(nil), flags)
 	MustRegisterCmd("encryptwallet", (*EncryptWalletCmd)(nil), flags)
-	MustRegisterCmd("estimatesmartfee", (*EstimateFeeCmd)(nil), flags)
+	MustRegisterCmd("estimatefee", (*EstimateFeeCmd)(nil), flags)
+	MustRegisterCmd("estimatesmartfee", (*EstimateSmartFeeCmd)(nil), flags)
 	MustRegisterCmd("estimatepriority", (*EstimatePriorityCmd)(nil), flags)
 	MustRegisterCmd("getaccount", (*GetAccountCmd)(nil), flags)
 	MustRegisterCmd("getaccountaddress", (*GetAccountAddressCmd)(nil), flags)

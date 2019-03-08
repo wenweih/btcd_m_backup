@@ -114,8 +114,8 @@ type GetBlockChainInfoResult struct {
 	Bip9SoftForks        map[string]*Bip9SoftForkDescription `json:"bip9_softforks"`
 }
 
-// EstimateFeeResult models the data returns from the EstimateFee command
-type EstimateFeeResult struct {
+// EstimateSmartFeeResult models the data returns from the EstimateFee command
+type EstimateSmartFeeResult struct {
 	FeeRate float64 `json:"feerate"`
 	Blocks int  `json:"blocks"`
 }

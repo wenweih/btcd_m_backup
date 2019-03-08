@@ -572,26 +572,60 @@ func (c *Client) GetRawMempoolVerbose() (map[string]btcjson.GetRawMempoolVerbose
 	return c.GetRawMempoolVerboseAsync().Receive()
 }
 
-// FutureEstimateFeeResult is a future promise to deliver the result of a
+// FutureEstimateSmartFeeResult is a future promise to deliver the result of a
 // EstimateFeeAsync RPC invocation (or an applicable error).
-type FutureEstimateFeeResult chan *response
+type FutureEstimateSmartFeeResult chan *response
 
 // Receive waits for the response promised by the future and returns the info
 // provided by the server.
-func (r FutureEstimateFeeResult) Receive() (*btcjson.EstimateFeeResult, error) {
+func (r FutureEstimateSmartFeeResult) Receive() (*btcjson.EstimateSmartFeeResult, error) {
 	res, err := receiveFuture(r)
 	if err != nil {
 		return nil, err
 	}
 
 	// Unmarshal result as a getinfo result object.
-	var feeRes btcjson.EstimateFeeResult
+	var feeRes btcjson.EstimateSmartFeeResult
 	err = json.Unmarshal(res, &feeRes)
 	if err != nil {
 		return nil, err
 	}
 
 	return &feeRes, nil
+}
+
+// FutureEstimateFeeResult is a future promise to deliver the result of a
+// EstimateFeeAsync RPC invocation (or an applicable error).
+type FutureEstimateFeeResult chan *response
+
+// Receive waits for the response promised by the future and returns the info
+// provided by the server.
+func (r FutureEstimateFeeResult) Receive() (float64, error) {
+	res, err := receiveFuture(r)
+	if err != nil {
+		return -1, err
+	}
+
+	// Unmarshal result as a getinfo result object.
+	// var feeRes btcjson.EstimateFeeResult
+	var fee float64
+	err = json.Unmarshal(res, &fee)
+	if err != nil {
+		return -1, err
+	}
+
+	return fee, nil
+}
+
+
+// EstimateSmartFeeAsync returns an instance of a type that can be used to get the result
+// of the RPC at some future time by invoking the Receive function on the
+// returned instance.
+//
+// See EstimateFee for the blocking version and more details.
+func (c *Client) EstimateSmartFeeAsync(numBlocks int64) FutureEstimateSmartFeeResult {
+	cmd := btcjson.NewEstimateSmartFeeCmd(numBlocks)
+	return c.sendCmd(cmd)
 }
 
 // EstimateFeeAsync returns an instance of a type that can be used to get the result
@@ -604,8 +638,13 @@ func (c *Client) EstimateFeeAsync(numBlocks int64) FutureEstimateFeeResult {
 	return c.sendCmd(cmd)
 }
 
+// EstimateSmartFee provides an estimated fee  in bitcoins per kilobyte.
+func (c *Client) EstimateSmartFee(numBlocks int64) (*btcjson.EstimateSmartFeeResult, error) {
+	return c.EstimateSmartFeeAsync(numBlocks).Receive()
+}
+
 // EstimateFee provides an estimated fee  in bitcoins per kilobyte.
-func (c *Client) EstimateFee(numBlocks int64) (*btcjson.EstimateFeeResult, error) {
+func (c *Client) EstimateFee(numBlocks int64) (float64, error) {
 	return c.EstimateFeeAsync(numBlocks).Receive()
 }
 
